@@ -1,0 +1,16 @@
+package br.com.semestral.automacao_pagamentos.model;
+
+public record Email(String to, String subject, String body){
+
+   // Getters explícitos para garantir compatibilidade
+   public String getTo() { 
+      return to; 
+   }
+   public String getSubject() { 
+      return subject; 
+   }
+   public String getBody() { 
+      return body; 
+   }
+
+}
