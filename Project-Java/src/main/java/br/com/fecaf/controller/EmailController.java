@@ -1,0 +1,37 @@
+package br.com.fecaf.controller;
+
+
+import br.com.fecaf.model.Email;
+import br.com.fecaf.service.EmailService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/email")
+@CrossOrigin(origins = "http://127.0.0.1:5500", allowedHeaders = "*")
+public class EmailController {
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    public EmailController(EmailService emailService) {
+        this.emailService = emailService;
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        System.out.println("Acessou o Get");
+        return "Api no Ar funcionando ...";
+
+    }
+
+    @PostMapping("/enviarEmail")
+    public ResponseEntity<?> enviarEmail(@RequestBody Email email){
+      return emailService.enviarEmail(email);
+
+    }
+
+}
