@@ -12,12 +12,14 @@ public class App {
         SpringApplication.run(App.class, args);
     }
 
+    //Inicia a aplicação
     @Bean
     CommandLineRunner initialization () {
         return args -> {
             System.out.println("O servidor está no ar !");
         };
     }
+    
 
 
 
