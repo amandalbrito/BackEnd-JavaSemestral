@@ -1,6 +1,5 @@
 package br.com.fecaf.model;
 
-import br.com.fecaf.model.User;
 
 public record Email(String to, String subject, String body){
 

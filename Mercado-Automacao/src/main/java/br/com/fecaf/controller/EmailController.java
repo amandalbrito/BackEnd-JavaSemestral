@@ -1,7 +1,6 @@
 package br.com.fecaf.controller;
 
 
-import br.com.fecaf.model.Email;
 import br.com.fecaf.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,9 +33,9 @@ public class EmailController {
 
     //Responde a requisições POST/ Envia E-mail
     @PostMapping("/enviarEmail")
-    public ResponseEntity<?> enviarEmail(@RequestParam String destinatario, int carrinho, int pessoa) {
+    public ResponseEntity<?> enviarEmail(@RequestParam String destinatario, int pessoa) {
         try {
-            String mensagem = emailService.enviarEmail(destinatario, carrinho, pessoa);
+            String mensagem = emailService.enviarEmail(destinatario, pessoa);
             return ResponseEntity.ok(mensagem);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

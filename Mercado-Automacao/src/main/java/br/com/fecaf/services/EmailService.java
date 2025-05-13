@@ -1,14 +1,10 @@
 package br.com.fecaf.services;
 
-import br.com.fecaf.model.Email;
-import br.com.fecaf.model.User;
-import br.com.fecaf.repository.CartItemRepository;
-import br.com.fecaf.repository.UserRepository;
-import br.com.fecaf.model.CartItem;
+import br.com.fecaf.model.*;
+import br.com.fecaf.repository.CartRepository;
+import br.com.fecaf.repository.CadastroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -17,11 +13,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    //Email de Confirmação de Compra
-
     //Integra com o Banco de Dados
-    private final UserRepository userRepository;
-    private final CartItemRepository cartItemRepository;
+    private final CadastroRepository cadastroRepository;
+    private final CartRepository cartRepository;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -29,28 +23,29 @@ public class EmailService {
 
 
     @Autowired
-    public EmailService(JavaMailSender mailSender, UserRepository userRepository, @Value("${spring.mail.from}") String fromEmail, CartItemRepository cartItemRepository) {
+    public EmailService(JavaMailSender mailSender, CadastroRepository cadastroRepository, @Value("${spring.mail.from}") String fromEmail, CartRepository cartRepository) {
         this.mailSender = mailSender;
         this.fromEmail = fromEmail;
-        this.userRepository = userRepository;
-        this.cartItemRepository = cartItemRepository;
+        this.cadastroRepository = cadastroRepository;
+        this.cartRepository = cartRepository;
 
     }
 
 
     //Rota do Email
-    public String enviarEmail(String destinatario, int carrinho, int pessoa) {
+    public String enviarEmail(String destinatario, int pessoa) {
 
         // Busca o usuário no banco de dados
-        User user = userRepository.findByEmail(destinatario).orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
-        CartItem cartItem = cartItemRepository.findByUserIdAndProductId(carrinho, pessoa);
+        Cadastro cadastro = cadastroRepository.findByEmail(destinatario).orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+        Cart cart = cartRepository.findByUserId(pessoa).orElseThrow(() -> new IllegalArgumentException("Carrinho não encontrado"));
 
 
         // Cria o email usando o email do usuário
-        Email email = new Email(user.getEmail(), "Agradecemos por comprar conosco!",
+        Email email = new Email(cadastro.getEmail(), "Agradecemos por comprar conosco!",
                 "Agradecemos por sua compra! \nAbaixo você consegue verificar alista dos itens comprados:"
-                        + "\n     Produto" + "\n     " +cartItem.getProduct()
-                        +"     " + cartItem.getQuantity());
+                        + "\n     Produto" + "\n     " +cart.getCartItems()
+                        +"     " + cart.calcularTotal()
+        );
 
 
         //Verifica e impede o e-mail do destintário nulo
