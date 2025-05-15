@@ -1,6 +1,6 @@
 package br.com.fecaf.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +43,7 @@ public class Cart {
         this.user = user;
     }
 
+
     public List<CartItem> getCartItems() {
         return cartItems;
     }
@@ -62,7 +63,7 @@ public class Cart {
         CartItem novoItem = new CartItem();
         novoItem.setProduct(product);
         novoItem.setQuantity(quantidade);
-        novoItem.setCart(this);
+        //novoItem.setCart(this);
         cartItems.add(novoItem);
     }
     public void removerItem(int productId) {

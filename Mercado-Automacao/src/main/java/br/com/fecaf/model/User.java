@@ -1,6 +1,6 @@
 package br.com.fecaf.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "tbl_users")
@@ -10,11 +10,20 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    private String nome;
     private String email;
     private String senha;
     private String cpf;
 
     // Getters e Setters
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
     public int getId() {
         return id;
     }
