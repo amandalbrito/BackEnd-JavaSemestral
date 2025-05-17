@@ -1,7 +1,6 @@
 package br.com.fecaf.services;
 
 import br.com.fecaf.model.Cart;
-import br.com.fecaf.model.CartItem;
 import br.com.fecaf.model.Product;
 import br.com.fecaf.model.User;
 import br.com.fecaf.repository.CartRepository;

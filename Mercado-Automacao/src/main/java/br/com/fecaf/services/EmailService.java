@@ -2,7 +2,6 @@ package br.com.fecaf.services;
 
 import br.com.fecaf.model.*;
 import br.com.fecaf.repository.CartRepository;
-import br.com.fecaf.repository.CadastroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;

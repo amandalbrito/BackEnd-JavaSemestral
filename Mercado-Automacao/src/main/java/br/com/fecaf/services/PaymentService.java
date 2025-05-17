@@ -1,5 +1,7 @@
 package br.com.fecaf.services;
 
+import br.com.fecaf.model.PaymentEntity;
+import br.com.fecaf.repository.PaymentRepository;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
@@ -9,18 +11,21 @@ import com.stripe.param.PaymentIntentCreateParams;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 
 @Service
 public class PaymentService {
 
-    //Configura apiKey do Stripe
-    public PaymentService (@Value("${stripe.apiKey}") String apiKey){
+    private final PaymentRepository paymentRepository;
 
+    public PaymentService(
+            @Value("${stripe.apiKey}") String apiKey,
+            PaymentRepository paymentRepository
+    ) {
         Stripe.apiKey = apiKey;
-
+        this.paymentRepository = paymentRepository;
     }
 
-    //Cria e armazena dados de Intenção de Pagamento
     public PaymentIntent createPaymentIntent(Long amount, String currency, String description) throws StripeException {
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(amount)
@@ -28,10 +33,20 @@ public class PaymentService {
                 .setDescription(description)
                 .build();
 
-        return PaymentIntent.create(params);
+        PaymentIntent intent = PaymentIntent.create(params);
+
+        PaymentEntity payment = new PaymentEntity();
+        payment.setAmount(amount);
+        payment.setCurrency(currency);
+        payment.setDescription(description);
+        payment.setStripePaymentId(intent.getId());
+        payment.setCreatedAt(LocalDateTime.now());
+
+        paymentRepository.save(payment);
+
+        return intent;
     }
 
-    //Cria uma conta para o Cliente no Stripe
     public Customer criarUsuario(String email, String nome) throws StripeException {
         CustomerCreateParams params = CustomerCreateParams.builder()
                 .setEmail(email)
@@ -39,6 +54,4 @@ public class PaymentService {
                 .build();
         return Customer.create(params);
     }
-
-
 }

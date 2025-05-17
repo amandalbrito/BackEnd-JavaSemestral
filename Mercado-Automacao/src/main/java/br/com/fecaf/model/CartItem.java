@@ -3,7 +3,7 @@ package br.com.fecaf.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "tbl_cart")
+@Table(name = "tbl_cart_item")
 public class CartItem {
 
     @Id
@@ -11,8 +11,8 @@ public class CartItem {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -29,12 +29,12 @@ public class CartItem {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public Cart getCart() {
+        return cart;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCart(Cart cart) {
+        this.cart = cart;
     }
 
     public Product getProduct() {

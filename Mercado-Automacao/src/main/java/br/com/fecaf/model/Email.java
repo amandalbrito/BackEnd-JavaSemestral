@@ -4,8 +4,6 @@ package br.com.fecaf.model;
 public record Email(String to, String subject, String body){
 
 
-
-    // Getters explícitos para garantir compatibilidade
     public String getTo() {
         return to;
     }

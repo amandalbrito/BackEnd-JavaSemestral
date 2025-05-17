@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-//Ponto de entrada para requisições via e-mail
 
 @RestController
 @RequestMapping("/email")
@@ -22,7 +21,6 @@ public class EmailController {
         this.emailService = emailService;
     }
 
-    //Retorno teste
     @GetMapping("/test")
     public String test() {
         System.out.println("Acessou o Get");
@@ -31,7 +29,6 @@ public class EmailController {
     }
 
 
-    //Responde a requisições POST/ Envia E-mail
     @PostMapping("/enviarEmail")
     public ResponseEntity<?> enviarEmail(@RequestParam String destinatario, int pessoa) {
         try {

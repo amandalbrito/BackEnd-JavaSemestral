@@ -26,10 +26,9 @@ public class CartItemController {
         }
     }
 
-    // Endpoint para visualizar o carrinho de um usuário
     @GetMapping("/{userId}")
     public ResponseEntity<List<CartItem>> getUserCart(@PathVariable int userId) {
-        List<CartItem> cartItems = cartItemService.getUserCart(userId);
+        List<CartItem> cartItems = cartItemService.getCartItemsByUserId(userId);
         if (cartItems.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

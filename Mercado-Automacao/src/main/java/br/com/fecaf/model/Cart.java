@@ -63,9 +63,10 @@ public class Cart {
         CartItem novoItem = new CartItem();
         novoItem.setProduct(product);
         novoItem.setQuantity(quantidade);
-        //novoItem.setCart(this);
+        novoItem.setCart(this);  // Correção: ativada esta linha para manter o relacionamento bidirecional
         cartItems.add(novoItem);
     }
+
     public void removerItem(int productId) {
         cartItems.removeIf(item -> item.getProduct().getId() == productId);
     }
@@ -78,6 +79,7 @@ public class Cart {
             }
         }
     }
+
     public double calcularTotal() {
         double total = 0;
         for (CartItem item : cartItems) {
