@@ -2,6 +2,8 @@ package br.com.fecaf.services;
 
 import br.com.fecaf.model.*;
 import br.com.fecaf.repository.CartRepository;
+import br.com.fecaf.repository.PaymentRepository;
+import br.com.fecaf.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -12,62 +14,91 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    //Integra com o Banco de Dados
-    private final CadastroRepository cadastroRepository;
+    private final JavaMailSender mailSender;
+    private final String fromEmail;
+    private final UserRepository userRepository;
+    private final PaymentRepository paymentRepository;
     private final CartRepository cartRepository;
 
     @Autowired
-    private JavaMailSender mailSender;
-    private final String fromEmail;
-
-
-    @Autowired
-    public EmailService(JavaMailSender mailSender, CadastroRepository cadastroRepository, @Value("${spring.mail.from}") String fromEmail, CartRepository cartRepository) {
+    public EmailService(JavaMailSender mailSender,
+                        UserRepository userRepository,
+                        PaymentRepository paymentRepository,
+                        CartRepository cartRepository,
+                        @Value("${spring.mail.from}") String fromEmail) {
         this.mailSender = mailSender;
-        this.fromEmail = fromEmail;
-        this.cadastroRepository = cadastroRepository;
+        this.userRepository = userRepository;
+        this.paymentRepository = paymentRepository;
         this.cartRepository = cartRepository;
-
+        this.fromEmail = fromEmail;
     }
 
+    public String enviarEmail(int userId) {
 
-    //Rota do Email
-    public String enviarEmail(String destinatario, int pessoa) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-        // Busca o usuário no banco de dados
-        Cadastro cadastro = cadastroRepository.findByEmail(destinatario).orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
-        Cart cart = cartRepository.findByUserId(pessoa).orElseThrow(() -> new IllegalArgumentException("Carrinho não encontrado"));
+        PaymentEntity payment = paymentRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Pagamento não encontrado"));
 
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Carrinho não encontrado"));
 
-        // Cria o email usando o email do usuário
-        Email email = new Email(cadastro.getEmail(), "Agradecemos por comprar conosco!",
-                "Agradecemos por sua compra! \nAbaixo você consegue verificar alista dos itens comprados:"
-                        + "\n     Produto" + "\n     " +cart.getCartItems()
-                        +"     " + cart.calcularTotal()
+        StringBuilder itensComprados = new StringBuilder();
+        double totalCalculado = 0.0;
+
+        for (CartItem item : cart.getCartItems()) {
+            String nomeProduto = item.getProduct().getNome();
+            int quantidade = item.getQuantity();
+            double preco = item.getProduct().getPreco();
+            double subtotal = quantidade * preco;
+            totalCalculado += subtotal;
+
+            itensComprados.append("\n- ")
+                    .append(nomeProduto)
+                    .append(" | Quantidade: ").append(quantidade)
+                    .append(" | Preço unitário: R$").append(String.format("%.2f", preco))
+                    .append(" | Subtotal: R$").append(String.format("%.2f", subtotal));
+        }
+
+        String corpoEmail = String.format("""
+            Olá %s,
+            
+            Obrigada pela sua compra no Fila Free!!
+            
+            Detalhes do pedido:
+            Email do cliente: %s
+            Valor total pago: R$%.2f
+            Moeda: %s
+            Data da compra: %s
+            
+            Produtos adquiridos: %s
+            
+            Total calculado: R$%.2f
+            
+            Agradecemos pela preferência!
+            """,
+                user.getNome(),
+                user.getEmail(),
+                payment.getAmount() / 100.0,
+                payment.getCurrency(),
+                payment.getCreatedAt(),
+                itensComprados.toString(),
+                totalCalculado
         );
 
-
-        //Verifica e impede o e-mail do destintário nulo
-        if (email.getTo() == null || email.getTo().isEmpty()) {
-            throw new IllegalArgumentException("O endereço de E-mail não pode ser vazio");
-
-        }
-
-
-        //Configurações do E-mail
+        // Envia o e-mail
         SimpleMailMessage mensagem = new SimpleMailMessage();
         mensagem.setFrom(fromEmail);
-        mensagem.setTo(email.to());
-        mensagem.setSubject(email.subject());
-        mensagem.setText(email.body());
+        mensagem.setTo(user.getEmail());
+        mensagem.setSubject("Confirmação de Compra - Fila Free");
+        mensagem.setText(corpoEmail);
 
-        //Envio do E-mail
         try {
             mailSender.send(mensagem);
-            return "Email enviado com sucesso!";
+            return "E-mail enviado com sucesso!";
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao enviar email: " + e.getMessage());
+            throw new RuntimeException("Erro ao enviar e-mail: " + e.getMessage());
         }
     }
-
 }

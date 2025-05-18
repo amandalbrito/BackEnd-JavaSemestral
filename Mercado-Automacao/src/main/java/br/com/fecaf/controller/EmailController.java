@@ -30,9 +30,9 @@ public class EmailController {
 
 
     @PostMapping("/enviarEmail")
-    public ResponseEntity<?> enviarEmail(@RequestParam String destinatario, int pessoa) {
+    public ResponseEntity<String> enviarEmail(@RequestParam int pessoa) {
         try {
-            String mensagem = emailService.enviarEmail(destinatario, pessoa);
+            String mensagem = emailService.enviarEmail(pessoa);
             return ResponseEntity.ok(mensagem);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

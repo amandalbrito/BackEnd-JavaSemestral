@@ -14,4 +14,6 @@ public class PaymentIntentResponse {
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
     }
+
+
 }
