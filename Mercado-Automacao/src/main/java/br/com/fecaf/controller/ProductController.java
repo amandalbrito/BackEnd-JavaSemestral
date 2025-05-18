@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
 @RequestMapping("/api/products")
+@CrossOrigin(origins = "http://127.0.0.1:5500") // Liberar CORS só para seu frontend
+
 public class ProductController {
 
     @Autowired
@@ -36,8 +39,9 @@ public class ProductController {
 
     @GetMapping("/barcode/{codigoBarras}")
     public ResponseEntity<Product> getProductByCodigoBarras(@PathVariable String codigoBarras) {
-        Product product = productService.getProductByCodigoBarras(codigoBarras);
-        return product != null ? ResponseEntity.ok(product) : ResponseEntity.notFound().build();
+        Optional<Product> product = productService.getProductByCodigoBarras(codigoBarras);
+        return product.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

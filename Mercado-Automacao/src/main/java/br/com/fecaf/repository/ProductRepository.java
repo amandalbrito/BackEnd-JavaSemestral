@@ -1,11 +1,9 @@
 package br.com.fecaf.repository;
-
 import br.com.fecaf.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import java.util.Optional;
+
 public interface ProductRepository extends JpaRepository<Product, Integer> {
-
-    Product findByCodigoBarras(String codigoBarras);
+    Optional<Product> findByCodigoBarras(String codigoBarras);  // retorna Optional<Product>
 }

@@ -1,6 +1,8 @@
 package br.com.fecaf.model;
 
 import jakarta.persistence.*;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "tbl_products")
@@ -18,7 +20,10 @@ public class Product {
 
     private int estoque;
 
-    // Getters e Setters
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems = new ArrayList<>();
+
+    // Getters e Setters originais
     public int getId() {
         return id;
     }
@@ -57,5 +62,14 @@ public class Product {
 
     public void setEstoque(int estoque) {
         this.estoque = estoque;
+    }
+
+    // Getters e Setters da lista de cartItems
+    public List<CartItem> getCartItems() {
+        return cartItems;
+    }
+
+    public void setCartItems(List<CartItem> cartItems) {
+        this.cartItems = cartItems;
     }
 }

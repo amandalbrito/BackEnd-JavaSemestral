@@ -17,6 +17,10 @@ public class PaymentEntity {
     private String stripePaymentId;
     private LocalDateTime createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")  // chave estrangeira na tabela tbl_payments
+    private User user;
+
     // Getters e Setters
 
     public Long getId() {
