@@ -26,9 +26,8 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
-    // Alterado para retornar Optional
-    public Optional<Product> getProductByCodigoBarras(String codigoBarras) {
-        return productRepository.findByCodigoBarras(codigoBarras);  // já retorna Optional<Product>
+    public Product getProductByCodigoBarras(String codigoBarras) {
+        return productRepository.findByCodigoBarras(codigoBarras);
     }
 
     public void deleteProduct(int id) {
