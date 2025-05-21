@@ -2,8 +2,10 @@ package br.com.fecaf.services;
 
 import br.com.fecaf.dto.PaymentResponse;
 import br.com.fecaf.model.Cart;
+import br.com.fecaf.model.CartItem;
 import br.com.fecaf.model.Product;
 import br.com.fecaf.model.User;
+import br.com.fecaf.repository.CartItemRepository;
 import br.com.fecaf.repository.CartRepository;
 import br.com.fecaf.repository.ProductRepository;
 import br.com.fecaf.repository.UserRepository;
@@ -26,29 +28,51 @@ public class CartService {
     @Autowired
     private ProductRepository productRepository;
 
-    // Injetar PaymentService para usar no finalizarCompra
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
     @Autowired
     private PaymentService paymentService;
 
     public Cart getCartByUserId(int userId) {
-        Optional<Cart> cartOptional = cartRepository.findByUserId(userId);
-        return cartOptional.orElseGet(() -> {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-            Cart newCart = new Cart(user);
-            return cartRepository.save(newCart);
-        });
+        return cartRepository.findByUserIdAndFinalizadoFalse(userId)
+                .orElseGet(() -> {
+                    User user = userRepository.findById(userId)
+                            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                    Cart newCart = new Cart(user);
+                    return cartRepository.save(newCart);
+                });
     }
 
     @Transactional
     public Cart adicionarItem(int userId, int productId, int quantidade) {
+        // Garante que o carrinho existe
         Cart cart = getCartByUserId(userId);
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
-        cart.adicionarItem(product, quantidade);
-        return cartRepository.save(cart);
+        // Verifica se item já está no carrinho
+        Optional<CartItem> opt = cartItemRepository
+                .findByCartIdAndProductId(cart.getId(), productId);
+
+        if (opt.isPresent()) {
+            CartItem item = opt.get();
+            item.setQuantity(item.getQuantity() + quantidade);
+            cartItemRepository.save(item);
+        } else {
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+            CartItem newItem = new CartItem();
+            newItem.setCart(cart);
+            newItem.setProduct(product);
+            newItem.setQuantity(quantidade);
+            cartItemRepository.save(newItem);
+        }
+
+        // Recarrega o carrinho para refletir a lista atualizada
+        return cartRepository.findById(cart.getId())
+                .orElseThrow();
     }
+
 
     @Transactional
     public Cart removerItem(int userId, int productId) {
@@ -57,9 +81,11 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    public double calcularTotal(int userId) {
+    @Transactional
+    public Cart atualizarQuantidade(int userId, int productId, int quantidade) {
         Cart cart = getCartByUserId(userId);
-        return cart.calcularTotal();
+        cart.atualizarQuantidade(productId, quantidade);
+        return cartRepository.save(cart);
     }
 
     @Transactional
@@ -69,11 +95,8 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    @Transactional
-    public Cart atualizarQuantidade(int userId, int productId, int novaQuantidade) {
-        Cart cart = getCartByUserId(userId);
-        cart.atualizarQuantidade(productId, novaQuantidade);
-        return cartRepository.save(cart);
+    public double calcularTotal(int userId) {
+        return getCartByUserId(userId).calcularTotal();
     }
 
     @Transactional
@@ -83,19 +106,13 @@ public class CartService {
             throw new RuntimeException("Carrinho vazio, não é possível finalizar compra.");
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        // Calcular total em centavos (considerando que preço está em double em reais)
-        long totalCentavos = Math.round(cart.calcularTotal() * 100);
-
-        // Marcar carrinho como finalizado
+        long total = Math.round(cart.calcularTotal() * 100);
         cart.setFinalizado(true);
         cartRepository.save(cart);
 
-        // Criar pagamento e salvar no banco via PaymentService
-        String descricaoPagamento = "Pagamento do carrinho do usuário " + userId;
-
-        return paymentService.createPaymentResponse(totalCentavos, "brl", descricaoPagamento, user, cart);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        String desc = "Pagamento do carrinho do usuário " + userId;
+        return paymentService.createPaymentResponse(total, "brl", desc, user, cart);
     }
 }

@@ -5,7 +5,9 @@ import br.com.fecaf.dto.PaymentResponse;
 import br.com.fecaf.dto.QuantidadeRequest;
 import br.com.fecaf.exception.UnauthorizedException;
 import br.com.fecaf.model.Cart;
+import br.com.fecaf.model.Product;
 import br.com.fecaf.model.User;
+import br.com.fecaf.repository.ProductRepository;
 import br.com.fecaf.repository.UserRepository;
 import br.com.fecaf.security.JwtUtil;
 import br.com.fecaf.services.CartService;
@@ -29,6 +31,9 @@ public class CartController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ProductRepository productRepository;
+
     private int getUserId(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
@@ -49,12 +54,19 @@ public class CartController {
     }
 
     @PostMapping("/add")
-    public Cart addToCart(
-            @RequestBody AddCartRequest addRequest,
-            HttpServletRequest request) {
-        int userId = getUserId(request);
-        return cartService.adicionarItem(userId, addRequest.getProductId(), addRequest.getQuantidade());
+    public Cart addToCart(@RequestBody AddCartRequest addRequest, HttpServletRequest request) {
+        int userId = getUserId(request); // Obtém o ID do usuário a partir do token JWT
+        String codigoBarras = addRequest.getCodigoBarras(); // Captura o código de barras
+
+        // Lógica para encontrar o produto pelo código de barras
+        Product product = productRepository.findByCodigoBarras(codigoBarras);
+        if (product == null) {
+            throw new RuntimeException("Produto não encontrado com o código de barras: " + codigoBarras);
+        }
+
+        return cartService.adicionarItem(userId, product.getId(), addRequest.getQuantidade());
     }
+
 
     @PutMapping("/{productId}")
     public Cart updateQuantidade(
