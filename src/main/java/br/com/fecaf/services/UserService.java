@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -30,5 +31,18 @@ public class UserService {
 
     public void deletarUser(int id) {
         userRepository.deleteById(id);
+    }
+
+    public boolean resetPassword(String email, String verificationCode, String newPassword) {
+        // Ignorando verificação do código por enquanto
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            String senhaCriptografada = passwordEncoder.encode(newPassword);
+            user.setSenha(senhaCriptografada);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 }
