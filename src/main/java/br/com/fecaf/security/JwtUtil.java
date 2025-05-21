@@ -14,12 +14,8 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // Chave base64 segura e fixa com 512 bits (64 bytes)
     private static final String SECRET_STRING_BASE64 = "w5ZNLvFiR9Jq+ukFnmVi2XZLtzNIxD7x4hQckPiF0XT8KcaWfCoM76yRs3TTdp9azxCjsPjK2qY6+LjxQkSbRg==";
-
-    // Decodifica a chave base64 para bytes e cria SecretKey
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(Base64.getDecoder().decode(SECRET_STRING_BASE64));
-
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 horas
 
     public String gerarToken(String email) {

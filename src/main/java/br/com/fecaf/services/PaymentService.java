@@ -1,7 +1,9 @@
 package br.com.fecaf.services;
 
-import br.com.fecaf.model.PaymentResponse;
+import br.com.fecaf.dto.PaymentResponse;
+import br.com.fecaf.model.Cart;
 import br.com.fecaf.model.PaymentEntity;
+import br.com.fecaf.model.User;
 import br.com.fecaf.repository.PaymentRepository;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
@@ -29,7 +31,6 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    // Método existente
     public PaymentIntent createPaymentIntent(Long amount, String currency, String description) throws StripeException {
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(amount)
@@ -37,28 +38,31 @@ public class PaymentService {
                 .setDescription(description)
                 .build();
 
-        PaymentIntent intent = PaymentIntent.create(params);
+        return PaymentIntent.create(params);
+    }
 
+    public PaymentResponse createPaymentResponse(Long amount, String currency, String description, User user, Cart cart) throws StripeException {
+        // Criar PaymentIntent Stripe
+        PaymentIntent intent = createPaymentIntent(amount, currency, description);
+
+        // Salvar PaymentEntity vinculando user e cart
         PaymentEntity payment = new PaymentEntity();
         payment.setAmount(amount);
         payment.setCurrency(currency);
         payment.setDescription(description);
         payment.setStripePaymentId(intent.getId());
         payment.setCreatedAt(LocalDateTime.now());
+        payment.setUser(user);
+        payment.setCart(cart);
 
         paymentRepository.save(payment);
 
-        return intent;
-    }
-
-    // Novo método com PaymentResponse
-    public PaymentResponse createPaymentResponse(Long amount, String currency, String description) throws StripeException {
-        PaymentIntent intent = createPaymentIntent(amount, currency, description);
-
         String formattedAmount = convertCentavosToReais(amount);
 
+        // Retornando DTO com paymentIntentId e clientSecret
         return new PaymentResponse(
                 intent.getId(),
+                intent.getClientSecret(),
                 amount,
                 formattedAmount
         );

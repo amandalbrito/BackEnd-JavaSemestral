@@ -9,5 +9,6 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
 
     Optional<PaymentEntity> findByUser_Id(int userId);
 
+    Optional<PaymentEntity> findByStripePaymentId(String stripePaymentId);
 
 }

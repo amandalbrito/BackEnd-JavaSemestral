@@ -12,12 +12,15 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)  // nullable false garante integridade
     private User user;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
+
+    @Column(name = "is_finalizado", nullable = false)
+    private boolean finalizado = false;  // já inicializa para evitar null
 
     // Construtores
     public Cart() {}
@@ -43,7 +46,6 @@ public class Cart {
         this.user = user;
     }
 
-
     public List<CartItem> getCartItems() {
         return cartItems;
     }
@@ -52,6 +54,15 @@ public class Cart {
         this.cartItems = cartItems;
     }
 
+    public boolean isFinalizado() {
+        return finalizado;
+    }
+
+    public void setFinalizado(boolean finalizado) {
+        this.finalizado = finalizado;
+    }
+
+    // Métodos utilitários para manipulação do carrinho
     public void adicionarItem(Product product, int quantidade) {
         for (CartItem item : cartItems) {
             if (item.getProduct().getId() == product.getId()) {
@@ -63,7 +74,7 @@ public class Cart {
         CartItem novoItem = new CartItem();
         novoItem.setProduct(product);
         novoItem.setQuantity(quantidade);
-        novoItem.setCart(this);  // Correção: ativada esta linha para manter o relacionamento bidirecional
+        novoItem.setCart(this);  // Relacionamento bidirecional
         cartItems.add(novoItem);
     }
 

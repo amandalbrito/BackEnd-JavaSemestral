@@ -1,53 +1,101 @@
 package br.com.fecaf.controller;
 
+import br.com.fecaf.dto.AddCartRequest;
+import br.com.fecaf.dto.PaymentResponse;
+import br.com.fecaf.dto.QuantidadeRequest;
+import br.com.fecaf.exception.UnauthorizedException;
 import br.com.fecaf.model.Cart;
+import br.com.fecaf.model.User;
+import br.com.fecaf.repository.UserRepository;
+import br.com.fecaf.security.JwtUtil;
 import br.com.fecaf.services.CartService;
+import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/cart")
-@CrossOrigin(origins = "")
+@RequestMapping("/api/cart")
+@CrossOrigin(origins = "*")
 public class CartController {
 
     @Autowired
     private CartService cartService;
 
-    @PostMapping("/add")
-    public Cart adicionarItem(
-            @RequestParam int userId,
-            @RequestParam int productId,
-            @RequestParam int quantidade) {
-        return cartService.adicionarItem(userId, productId, quantidade);
-    }
+    @Autowired
+    private JwtUtil jwtUtil;
 
-    @DeleteMapping("/remove")
-    public Cart removerItem(
-            @RequestParam int userId,
-            @RequestParam int productId) {
-        return cartService.removerItem(userId, productId);
-    }
+    @Autowired
+    private UserRepository userRepository;
 
-    @PutMapping("/update")
-    public Cart atualizarQuantidade(
-            @RequestParam int userId,
-            @RequestParam int productId,
-            @RequestParam int quantidade) {
-        return cartService.atualizarQuantidade(userId, productId, quantidade);
+    private int getUserId(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            String email = jwtUtil.getEmailFromToken(token);
+
+            return userRepository.findByEmail(email)
+                    .map(User::getId)
+                    .orElseThrow(() -> new UnauthorizedException("Usuário não encontrado."));
+        }
+        throw new UnauthorizedException("Token JWT ausente ou inválido.");
     }
 
     @GetMapping
-    public Cart getCart(@RequestParam int userId) {
+    public Cart getCart(HttpServletRequest request) {
+        int userId = getUserId(request);
         return cartService.getCartByUserId(userId);
     }
 
-    @GetMapping("/total")
-    public double calcularTotal(@RequestParam int userId) {
-        return cartService.calcularTotal(userId);
+    @PostMapping("/add")
+    public Cart addToCart(
+            @RequestBody AddCartRequest addRequest,
+            HttpServletRequest request) {
+        int userId = getUserId(request);
+        return cartService.adicionarItem(userId, addRequest.getProductId(), addRequest.getQuantidade());
+    }
+
+    @PutMapping("/{productId}")
+    public Cart updateQuantidade(
+            @PathVariable int productId,
+            @RequestBody QuantidadeRequest body,
+            HttpServletRequest request) {
+        int userId = getUserId(request);
+        return cartService.atualizarQuantidade(userId, productId, body.getQuantidade());
+    }
+
+    @DeleteMapping("/{productId}")
+    public Cart deleteFromCart(@PathVariable int productId, HttpServletRequest request) {
+        int userId = getUserId(request);
+        return cartService.removerItem(userId, productId);
     }
 
     @DeleteMapping("/clear")
-    public void limparCarrinho(@RequestParam int userId) {
+    public void clearCart(HttpServletRequest request) {
+        int userId = getUserId(request);
         cartService.limparCarrinho(userId);
+    }
+
+    @GetMapping("/total")
+    public double calcularTotal(HttpServletRequest request) {
+        int userId = getUserId(request);
+        return cartService.calcularTotal(userId);
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<?> finalizarCompra(HttpServletRequest request) {
+        int userId = getUserId(request);
+
+        if (userId == 0) {
+            return ResponseEntity.status(401).body("Usuário não autorizado.");
+        }
+
+        try {
+            PaymentResponse paymentResponse = cartService.finalizarCompra(userId);
+            return ResponseEntity.ok(paymentResponse);
+        } catch (RuntimeException | StripeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

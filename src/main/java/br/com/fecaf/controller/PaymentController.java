@@ -1,8 +1,10 @@
 package br.com.fecaf.controller;
 
+import br.com.fecaf.dto.PaymentResponse;
 import br.com.fecaf.model.*;
 import br.com.fecaf.repository.CartRepository;
 import br.com.fecaf.repository.PaymentRepository;
+import br.com.fecaf.services.CartService;
 import br.com.fecaf.services.PaymentService;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
@@ -13,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,7 +25,7 @@ import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "http://127.0.0.1:5500")
-@RequestMapping("/api/stripe")
+@RequestMapping("/api/payments")
 public class PaymentController {
 
     @Autowired
@@ -33,6 +37,9 @@ public class PaymentController {
     @Autowired
     private CartRepository cartRepository;
 
+    @Autowired
+    private CartService cartService;
+
     @Value("${stripe.apiKey}")
     private String stripeApiKey;
 
@@ -41,8 +48,7 @@ public class PaymentController {
         Stripe.apiKey = stripeApiKey;
     }
 
-    // calcula o valor do carrinho
-    @PostMapping("/create-payment-intent")
+    @PostMapping("/intent")
     public ResponseEntity<PaymentIntentResponse> createPaymentIntent(@RequestParam Long userId) {
         Optional<Cart> optionalCarrinho = cartRepository.findByUserId(userId.intValue());
 
@@ -62,9 +68,8 @@ public class PaymentController {
                     "Pagamento de produtos do carrinho"
             );
 
-            // Salva no banco
             PaymentEntity paymentEntity = new PaymentEntity();
-            paymentEntity.setAmount(total); // mantido em centavos
+            paymentEntity.setAmount(total);
             paymentEntity.setCurrency("brl");
             paymentEntity.setDescription("Pagamento de produtos do carrinho");
             paymentEntity.setStripePaymentId(intent.getId());
@@ -80,21 +85,27 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("/create-customer")
+    @PostMapping("/customer")
     public Customer criarConta(@RequestBody User user) throws StripeException {
         return paymentService.criarUsuario(user.getEmail(), user.getNome());
     }
 
-    @PostMapping("/create-payment-dto")
+    @PostMapping("/checkout")
     public PaymentResponse createPaymentResponse(@RequestBody Payment payment) throws StripeException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        Cart cart = cartService.getCartByUserId(user.getId());
+
         return paymentService.createPaymentResponse(
                 payment.getAmount(),
                 payment.getCurrency(),
-                payment.getDescription()
+                payment.getDescription(),
+                user,
+                cart
         );
     }
 
-    @PostMapping("/confirmar-pagamento")
+    @PostMapping("/confirm")
     public ResponseEntity<String> confirmarPagamento(@RequestParam String paymentIntentId,
                                                      @RequestParam String destinatario,
                                                      @RequestParam Long pessoa) {
@@ -103,7 +114,7 @@ public class PaymentController {
 
             if ("succeeded".equals(paymentIntent.getStatus())) {
                 RestTemplate restTemplate = new RestTemplate();
-                String url = String.format("http://localhost:8080/email/enviarEmail?destinatario=%s&pessoa=%d", pessoa);
+                String url = String.format("http://localhost:8080/email/enviarEmail?destinatario=%s&pessoa=%d", destinatario, pessoa);
                 restTemplate.postForObject(url, null, String.class);
 
                 return ResponseEntity.ok("Pagamento confirmado e e-mail enviado.");

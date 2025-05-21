@@ -10,13 +10,27 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(nullable = false)
     private String nome;
+
+    @Column(nullable = false)
     private double preco;
 
-    @Column(name = "codigo_barras", unique = true)
+    @Column(name = "codigo_barras", unique = true, nullable = false)
     private String codigoBarras;
 
+    @Column(nullable = false)
     private int estoque;
+
+    // Construtores
+    public Product() {}
+
+    public Product(String nome, double preco, String codigoBarras, int estoque) {
+        this.nome = nome;
+        this.preco = preco;
+        this.codigoBarras = codigoBarras;
+        this.estoque = estoque;
+    }
 
     // Getters e Setters
     public int getId() {
