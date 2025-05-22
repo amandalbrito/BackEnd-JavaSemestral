@@ -54,18 +54,19 @@ public class CartController {
     }
 
     @PostMapping("/add")
-    public Cart addToCart(@RequestBody AddCartRequest addRequest, HttpServletRequest request) {
+    public ResponseEntity<Cart> addToCart(@RequestBody AddCartRequest addRequest, HttpServletRequest request) {
         int userId = getUserId(request); // Obtém o ID do usuário a partir do token JWT
         String codigoBarras = addRequest.getCodigoBarras(); // Captura o código de barras
-
         // Lógica para encontrar o produto pelo código de barras
         Product product = productRepository.findByCodigoBarras(codigoBarras);
         if (product == null) {
-            throw new RuntimeException("Produto não encontrado com o código de barras: " + codigoBarras);
+            return ResponseEntity.badRequest().body(null); // Retorna erro se o produto não for encontrado
         }
-
-        return cartService.adicionarItem(userId, product.getId(), addRequest.getQuantidade());
+        Cart updatedCart = cartService.adicionarItem(userId, product.getId(), addRequest.getQuantidade());
+        return ResponseEntity.ok(updatedCart); // Retorna o carrinho atualizado
     }
+
+
 
 
     @PutMapping("/{productId}")

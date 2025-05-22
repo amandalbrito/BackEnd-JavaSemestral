@@ -44,15 +44,13 @@ public class CartService {
                 });
     }
 
+
     @Transactional
     public Cart adicionarItem(int userId, int productId, int quantidade) {
         // Garante que o carrinho existe
         Cart cart = getCartByUserId(userId);
-
         // Verifica se item já está no carrinho
-        Optional<CartItem> opt = cartItemRepository
-                .findByCartIdAndProductId(cart.getId(), productId);
-
+        Optional<CartItem> opt = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
         if (opt.isPresent()) {
             CartItem item = opt.get();
             item.setQuantity(item.getQuantity() + quantidade);
@@ -60,18 +58,17 @@ public class CartService {
         } else {
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-
             CartItem newItem = new CartItem();
             newItem.setCart(cart);
             newItem.setProduct(product);
             newItem.setQuantity(quantidade);
             cartItemRepository.save(newItem);
         }
-
         // Recarrega o carrinho para refletir a lista atualizada
         return cartRepository.findById(cart.getId())
                 .orElseThrow();
     }
+
 
 
     @Transactional
