@@ -31,6 +31,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
+    // Cria o PaymentIntent com Stripe
     public PaymentIntent createPaymentIntent(Long amount, String currency, String description) throws StripeException {
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(amount)
@@ -41,6 +42,7 @@ public class PaymentService {
         return PaymentIntent.create(params);
     }
 
+    // Cria o registro da transação e retorna um objeto com as infos do pagamento
     public PaymentResponse createPaymentResponse(Long amount, String currency, String description, User user, Cart cart) throws StripeException {
         PaymentIntent intent = createPaymentIntent(amount, currency, description);
 
@@ -65,17 +67,24 @@ public class PaymentService {
         );
     }
 
+    // Converte valor em centavos (long) para reais formatados em R$
     private String convertCentavosToReais(Long centavos) {
         double reais = centavos / 100.0;
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
         return currencyFormatter.format(reais);
     }
 
+    // Cria um Customer (cliente) na plataforma Stripe
     public Customer criarUsuario(String email, String nome) throws StripeException {
         CustomerCreateParams params = CustomerCreateParams.builder()
                 .setEmail(email)
                 .setName(nome)
                 .build();
         return Customer.create(params);
+    }
+
+    // Recupera um PaymentIntent pelo ID (caso precise consultar depois)
+    public PaymentIntent retrievePaymentIntent(String paymentIntentId) throws StripeException {
+        return PaymentIntent.retrieve(paymentIntentId);
     }
 }
