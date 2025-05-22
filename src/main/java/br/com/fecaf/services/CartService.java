@@ -61,7 +61,6 @@ public class CartService {
             newItem.setQuantity(quantidade);
             cartItemRepository.save(newItem);
         }
-        // retorna o Cart já “graph-loaded” pelo próprio service
         return getCartByUserId(userId);
     }
 
