@@ -63,13 +63,20 @@ public class CartController {
     public ResponseEntity<Cart> addToCart(@RequestBody AddCartRequest addRequest, HttpServletRequest request) {
         int userId = getUserId(request);
         String codigoBarras = addRequest.getCodigoBarras();
+        System.out.println("Recebido código de barras: '" + codigoBarras + "'");
+
         Product product = productRepository.findByCodigoBarras(codigoBarras);
+
         if (product == null) {
+            System.out.println("Produto não encontrado no banco para código: '" + codigoBarras + "'");
             return ResponseEntity.badRequest().body(null);
         }
+        System.out.println("Produto encontrado: " + product.getNome());
+
         Cart updatedCart = cartService.adicionarItem(userId, product.getId(), addRequest.getQuantidade());
         return ResponseEntity.ok(updatedCart);
     }
+
 
     @PutMapping("/{productId}")
     public Cart updateQuantidade(
