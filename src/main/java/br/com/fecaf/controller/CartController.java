@@ -49,9 +49,15 @@ public class CartController {
 
     @GetMapping
     public Cart getCart(HttpServletRequest request) {
-        int userId = getUserId(request);
-        return cartService.getCartByUserId(userId);
+        try {
+            int userId = getUserId(request);
+            return cartService.getCartByUserId(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
+
 
     @PostMapping("/add")
     public ResponseEntity<Cart> addToCart(@RequestBody AddCartRequest addRequest, HttpServletRequest request) {
@@ -64,9 +70,6 @@ public class CartController {
         Cart updatedCart = cartService.adicionarItem(userId, product.getId(), addRequest.getQuantidade());
         return ResponseEntity.ok(updatedCart);
     }
-
-
-
 
     @PutMapping("/{productId}")
     public Cart updateQuantidade(

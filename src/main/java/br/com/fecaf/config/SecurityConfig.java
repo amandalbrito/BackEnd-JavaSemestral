@@ -3,6 +3,7 @@ package br.com.fecaf.config;
 import br.com.fecaf.config.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,24 +31,44 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // 1) Habilita o CORS usando o bean abaixo
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // 2) Desliga CSRF, pois usamos JWT
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // 3) Estateless: não guarda sessão no servidor
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // 4) BLOCO DE AUTORIZAÇÃO (SUBSTITUA o que você tinha aqui antes):
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/login", "/api/users/cadastrarUser ").permitAll()
+                        // 4.1) Libera todas as preflights de CORS (OPTIONS)
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // 4.2) Endpoints públicos (login e cadastro)
+                        .requestMatchers("/api/login", "/api/users/cadastrarUser").permitAll()
+
+                        // 4.3) TODO o resto TAMBÉM exige token
                         .anyRequest().authenticated()
                 )
+
+                // 5) Por fim, adiciona seu filtro de JWT ANTES do filtro de usuário e senha
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-
+    // Bean de CORS: permita explicitamente o seu front (ajuste a porta se mudar)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500", "http://localhost:5500"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(Arrays.asList(
+                "http://127.0.0.1:5500",
+                "http://localhost:5500"
+        ));
+        config.setAllowedMethods(Arrays.asList(
+                "GET","POST","PUT","DELETE","OPTIONS"
+        ));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true);
 
@@ -62,7 +83,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config
+    ) throws Exception {
         return config.getAuthenticationManager();
     }
 }
