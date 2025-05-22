@@ -28,7 +28,6 @@ public class User {
     @Column(unique = true, nullable = false)
     private String cpf;
 
-    // Opcional: código temporário para recuperação de senha
     private String passwordResetCode;
 
     @Column(updatable = false)

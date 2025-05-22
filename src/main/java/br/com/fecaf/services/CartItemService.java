@@ -36,7 +36,6 @@ public class CartItemService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // Buscar ou criar o carrinho
         Optional<Cart> optionalCart = cartRepository.findByUserId(userId);
         Cart cart;
 
@@ -48,7 +47,6 @@ public class CartItemService {
             cart = cartRepository.save(cart);
         }
 
-        // Verificar se o item já está no carrinho
         Optional<CartItem> optionalItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
 
         if (optionalItem.isPresent()) {

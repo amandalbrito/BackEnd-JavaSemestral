@@ -34,8 +34,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/login", "/api/users/cadastrarUser ").permitAll() // Permitir acesso a login e cadastro
-                        .anyRequest().authenticated() // Requer autenticação para qualquer outra requisição
+                        .requestMatchers("/api/login", "/api/users/cadastrarUser ").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

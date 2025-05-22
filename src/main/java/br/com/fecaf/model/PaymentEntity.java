@@ -26,7 +26,7 @@ public class PaymentEntity {
                 case "cancelled":
                     return CANCELLED;
                 default:
-                    return PENDING; // ou pode lançar exceção aqui
+                    return PENDING;
             }
         }
     }
@@ -57,7 +57,6 @@ public class PaymentEntity {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Getters e Setters (mantém igual)
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getAmount() { return amount; }

@@ -87,7 +87,6 @@ public class EmailService {
                 totalCalculado
         );
 
-        // Envia o e-mail
         SimpleMailMessage mensagem = new SimpleMailMessage();
         mensagem.setFrom(fromEmail);
         mensagem.setTo(user.getEmail());

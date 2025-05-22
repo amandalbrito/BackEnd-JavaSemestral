@@ -45,26 +45,21 @@
         private UserRepository userRepository;
 
         @Autowired
-        private JwtUtil jwtUtil;  // Componente para manipular JWT
+        private JwtUtil jwtUtil;
 
         @PostMapping("/create-payment-intent")
         public ResponseEntity<Map<String, String>> createPaymentIntent(@RequestHeader("Authorization") String authHeader) throws StripeException {
             try {
-                // Extrair token do header Authorization (esperado "Bearer <token>")
                 String token = authHeader.replace("Bearer ", "");
 
-                // Pegar email do token JWT
                 String email = jwtUtil.getEmailFromToken(token);
 
-                // Buscar usuário pelo email do token
                 User user = userRepository.findByEmail(email)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
 
-                // Buscar carrinho do usuário
                 Cart cart = cartRepository.findByUserId(user.getId())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrinho não encontrado"));
 
-                // Somar total do carrinho em centavos (preço em reais * 100)
                 long amount = cart.getCartItems().stream()
                         .mapToLong(item -> (long) (item.getProduct().getPreco() * 100) * item.getQuantity())
                         .sum();
@@ -74,7 +69,6 @@
 
                 PaymentIntent paymentIntent = stripeService.createPaymentIntent(amount, currency, description);
 
-                // Criar e salvar PaymentEntity
                 PaymentEntity payment = new PaymentEntity();
                 payment.setUser(user);
                 payment.setStripePaymentId(paymentIntent.getId());
@@ -107,11 +101,9 @@
                 User user = userRepository.findByEmail(email)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
 
-                // Recuperar PaymentIntent da Stripe
                 PaymentIntent paymentIntent = stripeService.retrievePaymentIntent(paymentIntentId);
 
                 if ("succeeded".equals(paymentIntent.getStatus())) {
-                    // Buscar pagamento no banco garantindo que pertença ao usuário logado
                     PaymentEntity payment = paymentRepository.findByStripePaymentId(paymentIntentId)
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pagamento não encontrado"));
 
@@ -119,11 +111,9 @@
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Pagamento não pertence ao usuário autenticado");
                     }
 
-                    // Converter e setar o status usando o enum
                     payment.setStatus(PaymentEntity.PaymentStatus.fromStripeStatus(paymentIntent.getStatus()));
                     paymentRepository.save(payment);
 
-                    // Enviar e-mail para a pessoa informada
                     String mensagem = emailService.enviarEmail(pessoa);
 
                     return ResponseEntity.ok(mensagem);

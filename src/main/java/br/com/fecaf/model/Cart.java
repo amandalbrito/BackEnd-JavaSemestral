@@ -62,7 +62,6 @@ public class Cart {
         this.finalizado = finalizado;
     }
 
-    // Métodos utilitários para manipulação do carrinho
     public void adicionarItem(Product product, int quantidade) {
         for (CartItem item : cartItems) {
             if (item.getProduct().getId() == product.getId()) {

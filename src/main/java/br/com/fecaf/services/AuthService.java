@@ -19,7 +19,6 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // Instancia o PasswordEncoder para usar BCrypt
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public String autenticar(String email, String senha) throws Exception {
@@ -31,12 +30,10 @@ public class AuthService {
 
         User user = userOpt.get();
 
-        // Usa BCrypt para comparar a senha digitada com a senha hash salva no banco
         if (!passwordEncoder.matches(senha, user.getSenha())) {
             throw new Exception("Senha incorreta");
         }
 
-        // Gera token usando o email do usuário
         return jwtUtil.gerarToken(email);
     }
 }

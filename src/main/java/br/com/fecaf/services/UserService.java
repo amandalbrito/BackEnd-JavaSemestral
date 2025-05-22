@@ -23,7 +23,6 @@ public class UserService {
     }
 
     public User salvarUser(User user) {
-        // Criptografa a senha ANTES de salvar no banco
         String senhaCriptografada = passwordEncoder.encode(user.getSenha());
         user.setSenha(senhaCriptografada);
         return userRepository.save(user);
@@ -34,7 +33,6 @@ public class UserService {
     }
 
     public boolean resetPassword(String email, String verificationCode, String newPassword) {
-        // Ignorando verificação do código por enquanto
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();

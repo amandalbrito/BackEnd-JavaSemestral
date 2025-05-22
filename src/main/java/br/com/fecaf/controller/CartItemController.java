@@ -15,7 +15,6 @@ public class CartItemController {
     @Autowired
     private CartItemService cartItemService;
 
-    // Endpoint para adicionar produto ao carrinho
     @PostMapping("/add/{userId}/{productId}")
     public ResponseEntity<CartItem> addToCart(@PathVariable int userId, @PathVariable int productId) {
         try {

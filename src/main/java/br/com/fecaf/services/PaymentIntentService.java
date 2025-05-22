@@ -22,7 +22,6 @@ public class PaymentIntentService {
     public PaymentResponse createPaymentIntent(long amount) throws StripeException {
         Stripe.apiKey = apiKey;
 
-        // Valor convertido para reais
         System.out.println("Criando pagamento no valor de: " + convertCentavosToReais(amount));
 
         Map<String, Object> params = new HashMap<>();
@@ -41,7 +40,6 @@ public class PaymentIntentService {
         );
     }
 
-    // Método auxiliar para converter centavos em reais formatado
     private String convertCentavosToReais(long centavos) {
         double reais = centavos / 100.0;
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));

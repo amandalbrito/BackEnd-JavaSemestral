@@ -42,10 +42,8 @@ public class PaymentService {
     }
 
     public PaymentResponse createPaymentResponse(Long amount, String currency, String description, User user, Cart cart) throws StripeException {
-        // Criar PaymentIntent Stripe
         PaymentIntent intent = createPaymentIntent(amount, currency, description);
 
-        // Salvar PaymentEntity vinculando user e cart
         PaymentEntity payment = new PaymentEntity();
         payment.setAmount(amount);
         payment.setCurrency(currency);
@@ -59,7 +57,6 @@ public class PaymentService {
 
         String formattedAmount = convertCentavosToReais(amount);
 
-        // Retornando DTO com paymentIntentId e clientSecret
         return new PaymentResponse(
                 intent.getId(),
                 intent.getClientSecret(),
