@@ -31,21 +31,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1) Habilita o CORS usando o bean abaixo
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // 2) Desliga CSRF, pois usamos JWT
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // 3) Estateless: não guarda sessão no servidor
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 4) BLOCO DE AUTORIZAÇÃO (SUBSTITUA o que você tinha aqui antes):
                 .authorizeHttpRequests(auth -> auth
-                        // 4.1) Libera todas as preflights de CORS (OPTIONS)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // 4.2) Endpoints públicos (login e cadastro)
                         .requestMatchers("/api/login", "/api/users/cadastrarUser").permitAll()
 
                         // 4.3) TODO o resto TAMBÉM exige token
@@ -58,7 +51,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Bean de CORS: permita explicitamente o seu front (ajuste a porta se mudar)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

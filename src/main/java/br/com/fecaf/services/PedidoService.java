@@ -34,21 +34,17 @@ public class PedidoService {
         pedido.setUser(carrinho.getUser());
         pedido.setPaymentIntentId(paymentIntentId);
 
-        // Calcula o total do pedido
         double total = carrinho.getCartItems().stream()
                 .mapToDouble(item -> item.getProduct().getPreco() * item.getQuantity())
                 .sum();
 
         pedido.setValorTotal(total);
 
-        // Atualiza cada CartItem para referenciar o pedido
         carrinho.getCartItems().forEach(item -> item.setPedido(pedido));
         pedido.setItens(carrinho.getCartItems());
 
-        // Salva o pedido (cascata deve salvar os itens também)
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
-        // Finaliza o carrinho
         carrinho.setFinalizado(true);
         cartRepository.save(carrinho);
 

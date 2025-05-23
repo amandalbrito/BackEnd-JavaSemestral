@@ -28,7 +28,6 @@ public class PaymentController {
             @RequestParam Long pessoa) {
 
         try {
-            // 💡 Como é fake, simplesmente assumimos que o pagamento foi bem-sucedido
             System.out.println("Pagamento simulado recebido: " + paymentIntentId);
 
             Pedido pedido = pedidoService.criarPedidoFinalizado(pessoa, paymentIntentId);
