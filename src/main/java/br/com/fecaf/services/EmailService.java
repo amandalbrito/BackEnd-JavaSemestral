@@ -2,7 +2,6 @@ package br.com.fecaf.services;
 
 import br.com.fecaf.model.*;
 import br.com.fecaf.repository.CartRepository;
-import br.com.fecaf.repository.PaymentRepository;
 import br.com.fecaf.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,18 +16,15 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final String fromEmail;
     private final UserRepository userRepository;
-    private final PaymentRepository paymentRepository;
     private final CartRepository cartRepository;
 
     @Autowired
     public EmailService(JavaMailSender mailSender,
                         UserRepository userRepository,
-                        PaymentRepository paymentRepository,
                         CartRepository cartRepository,
                         @Value("${spring.mail.from}") String fromEmail) {
         this.mailSender = mailSender;
         this.userRepository = userRepository;
-        this.paymentRepository = paymentRepository;
         this.cartRepository = cartRepository;
         this.fromEmail = fromEmail;
     }
@@ -37,9 +33,6 @@ public class EmailService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
-
-        PaymentEntity payment = paymentRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Pagamento não encontrado"));
 
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Carrinho não encontrado"));
@@ -80,9 +73,6 @@ public class EmailService {
             """,
                 user.getNome(),
                 user.getEmail(),
-                payment.getAmount() / 100.0,
-                payment.getCurrency(),
-                payment.getCreatedAt(),
                 itensComprados.toString(),
                 totalCalculado
         );

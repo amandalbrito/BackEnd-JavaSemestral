@@ -31,8 +31,6 @@ public class CartService {
     @Autowired
     private CartItemRepository cartItemRepository;
 
-    @Autowired
-    private PaymentService paymentService;
 
     public Cart getCartByUserId(int userId) {
         return cartRepository.findByUserIdAndFinalizadoFalse(userId)
@@ -105,6 +103,6 @@ public class CartService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         String desc = "Pagamento do carrinho do usuário " + userId;
-        return paymentService.createPaymentResponse(total, "brl", desc, user, cart);
+        return null;
     }
 }

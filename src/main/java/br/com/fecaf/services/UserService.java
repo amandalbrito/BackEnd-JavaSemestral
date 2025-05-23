@@ -28,6 +28,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public Optional<User> pesquisarUser(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+
     public void deletarUser(int id) {
         userRepository.deleteById(id);
     }
