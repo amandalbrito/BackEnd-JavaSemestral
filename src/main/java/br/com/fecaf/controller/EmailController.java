@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/email")
-@CrossOrigin(origins = "http://127.0.0.1:5500", allowedHeaders = "*")
+@CrossOrigin(origins = "https://filafree.netlify.app/", allowedHeaders = "*")
 public class EmailController {
 
     private final EmailService emailService;
