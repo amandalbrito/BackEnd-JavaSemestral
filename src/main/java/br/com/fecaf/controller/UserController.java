@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://127.0.0.1:5500", allowedHeaders = "*")
+@CrossOrigin(origins = "https://filafree.netlify.app/", allowedHeaders = "*")
 public class UserController {
 
     @Autowired
