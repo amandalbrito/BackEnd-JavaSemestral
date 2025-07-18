@@ -101,28 +101,15 @@
         </dependency>
     </dependencies>
 
-<<<<<<< HEAD
-         <build>
-    <plugins>
-        <!-- Plugin para empacotar o JAR como executável -->
-        <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin>
-    </plugins>
-</build>
 
-</project>
-=======
     <build>
-            <plugins>
-                <!-- Plugin para empacotar o JAR como executável -->
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                </plugin>
-            </plugins>
+        <plugins>
+            <!-- Plugin para empacotar o JAR como executável -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
 </project>
->>>>>>> 4aa2434 (Alterações para hospedagem)
