@@ -19,7 +19,7 @@ Thumbs.db
 
 # Arquivos de configuração com credenciais
 src/main/resources/application.yml
-.env
+
 
 # Diretórios de dependências (caso use algum)
 node_modules/
