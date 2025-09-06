@@ -67,6 +67,14 @@
             <scope>compile</scope>
         </dependency>
 
+        <!--PostgreSQL-->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+
         <!--Stripe-->
         <dependency>
             <groupId>com.stripe</groupId>
