@@ -52,7 +52,7 @@
             <version>1.0.0</version>
         </dependency>
 
-        <!--MySQL-->
+        <!--MySQL
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -66,7 +66,7 @@
             <version>24.1.0</version>
             <scope>compile</scope>
         </dependency>
-
+        -->
         <!--PostgreSQL-->
         <dependency>
             <groupId>org.postgresql</groupId>
