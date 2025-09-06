@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "https://front-end-java-semestral.vercel.app/", allowedHeaders = "*")
+@CrossOrigin(origins = "https://fila-free.vercel.app/", allowedHeaders = "*")
 public class UserController {
 
     @Autowired
