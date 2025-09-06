@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/email")
-@CrossOrigin(origins = "https://fila-free.vercel.app", allowedHeaders = "*")
 public class EmailController {
 
     private final EmailService emailService;
