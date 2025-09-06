@@ -19,7 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/cart")
-@CrossOrigin(origins = "https://fila-free.vercel.app/")
+@CrossOrigin(origins = "https://fila-free.vercel.app")
 public class CartController {
 
     @Autowired

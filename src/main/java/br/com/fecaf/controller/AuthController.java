@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "https://fila-free.vercel.app/", allowedHeaders = "*")
+@CrossOrigin(origins = "https://fila-free.vercel.app", allowedHeaders = "*")
 public class AuthController {
 
     @Autowired
