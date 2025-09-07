@@ -1,5 +1,6 @@
 package br.com.fecaf.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,9 +17,13 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+
+    @Value("${APP_CORS_ALLOWEDORIGINS}")
+    private String allowedOrigins;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -48,14 +53,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Lista de origens permitidas (frontend)
-        config.setAllowedOriginPatterns(Arrays.asList(
-                "https://fila-free.vercel.app" // produção
-                /*"http://localhost:3000",        // React local
-                "http://127.0.0.1:3000",
-                "http://localhost:5500",        // Live Server local
-                "http://127.0.0.1:5500"*/
-        ));
+        // Converte a variável de ambiente em lista
+        List<String> origins = Arrays.asList(allowedOrigins.split(","));
+        config.setAllowedOrigins(origins);
 
         // Métodos permitidos
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
