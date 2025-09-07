@@ -35,7 +35,7 @@ public class SecurityConfig {
                 // Regras de autorização
                 .authorizeHttpRequests(auth -> auth
                         // Permite todas as requisições OPTIONS (preflight)
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
 
                         // Permite tudo temporariamente (ajuste depois)
                         .anyRequest().permitAll()
@@ -50,11 +50,11 @@ public class SecurityConfig {
 
         // Lista de origens permitidas (frontend)
         config.setAllowedOrigins(Arrays.asList(
-                "https://fila-free.vercel.app", // produção
-                "http://localhost:3000",        // React local
+                "https://fila-free.vercel.app" // produção
+                /*"http://localhost:3000",        // React local
                 "http://127.0.0.1:3000",
                 "http://localhost:5500",        // Live Server local
-                "http://127.0.0.1:5500"
+                "http://127.0.0.1:5500"*/
         ));
 
         // Métodos permitidos
