@@ -50,7 +50,7 @@ public class SecurityConfig {
 
         // Lista de origens permitidas (frontend)
         config.setAllowedOrigins(Arrays.asList(
-                "https://fila-free.vercel.app/", // produção
+                "https://fila-free.vercel.app", // produção
                 "http://localhost:3000",        // React local
                 "http://127.0.0.1:3000",
                 "http://localhost:5500",        // Live Server local
