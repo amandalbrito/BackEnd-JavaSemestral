@@ -28,13 +28,11 @@ public class SecurityConfig {
                 // Desabilita CSRF
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // Stateless
+                // Stateless (sem sessão)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // Libera tudo temporariamente
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-                );
+                // Libera requisições (ajuste depois conforme sua regra de segurança)
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
         return http.build();
     }
@@ -43,18 +41,21 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
+        // Lista de origens permitidas
         config.setAllowedOrigins(Arrays.asList(
-                "https://fila-free.vercel.app",
-                "http://127.0.0.1:5500",
-                "http://localhost:5500"
+                "https://fila-free.vercel.app", // produção
+                "http://localhost:3000",        // React local padrão
+                "http://127.0.0.1:3000",        // React local IP
+                "http://localhost:5500",        // Live Server local
+                "http://127.0.0.1:5500"         // Live Server local IP
         ));
 
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("*"));
-        config.setAllowCredentials(true);
+        config.setAllowedHeaders(Arrays.asList("*")); // permite todos headers
+        config.setAllowCredentials(true);            // permite cookies/auth headers
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/**", config); // aplica a todas as rotas
         return source;
     }
 
