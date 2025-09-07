@@ -61,7 +61,13 @@ public class SecurityConfig {
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
         // Headers permitidos (necessário Authorization, Content-Type, etc.)
-        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin"
+        ));
 
         // Permite enviar cookies ou headers de autenticação
         config.setAllowCredentials(true);
