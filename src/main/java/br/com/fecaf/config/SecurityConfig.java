@@ -22,7 +22,7 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    @Value("${APP_CORS_ALLOWEDORIGINS}")
+    @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
 
     @Bean
