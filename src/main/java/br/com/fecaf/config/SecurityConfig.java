@@ -35,7 +35,7 @@ public class SecurityConfig {
                 // Regras de autorização
                 .authorizeHttpRequests(auth -> auth
                         // Permite todas as requisições OPTIONS (preflight)
-                        .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // Permite tudo temporariamente (ajuste depois)
                         .anyRequest().permitAll()
@@ -68,7 +68,7 @@ public class SecurityConfig {
 
         // Aplica configuração a todas as rotas
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/api/**", config);
         return source;
     }
 
