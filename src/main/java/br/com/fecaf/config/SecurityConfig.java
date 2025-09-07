@@ -31,19 +31,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Habilita CORS com a configuração abaixo
+                // Habilita CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
+                // Desabilita CSRF
                 .csrf(AbstractHttpConfigurer::disable)
 
+                // Stateless
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+                // Regras de autorização
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // libera preflight
+                        // Libera todas as requisições preflight (OPTIONS)
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Endpoints públicos
                         .requestMatchers("/api/login", "/api/users/cadastrarUser").permitAll()
+
+                        // Qualquer outra rota precisa estar autenticada
                         .anyRequest().authenticated()
                 )
 
+                // Filtro JWT antes do filtro padrão de autenticação
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -53,16 +62,17 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Lista dos domínios permitidos
+        // Domínios permitidos
         config.setAllowedOriginPatterns(Arrays.asList(
                 "https://fila-free.vercel.app",
                 "http://127.0.0.1:5500",
                 "http://localhost:5500"
         ));
 
-        config.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
+        // Métodos permitidos
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*"));
-        config.setAllowCredentials(true); // permite cookies/autenticação
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
