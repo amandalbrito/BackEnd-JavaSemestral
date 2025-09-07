@@ -68,7 +68,7 @@ public class SecurityConfig {
 
         // Aplica configuração a todas as rotas
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 
