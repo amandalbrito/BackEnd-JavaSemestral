@@ -1,105 +1,6 @@
-////package br.com.fecaf.config;
-////
-////import org.springframework.beans.factory.annotation.Value;
-////import org.springframework.context.annotation.Bean;
-////import org.springframework.context.annotation.Configuration;
-////import org.springframework.http.HttpMethod;
-////import org.springframework.security.authentication.AuthenticationManager;
-////import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-////import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-////import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-////import org.springframework.security.config.http.SessionCreationPolicy;
-////import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-////import org.springframework.security.crypto.password.PasswordEncoder;
-////import org.springframework.security.web.SecurityFilterChain;
-////import org.springframework.web.cors.CorsConfiguration;
-////import org.springframework.web.cors.CorsConfigurationSource;
-////import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-////
-////import java.util.Arrays;
-////import java.util.List;
-////
-////@Configuration
-////public class SecurityConfig {
-////
-////    @Value("${app.cors.allowed-origins}")
-////    private String allowedOrigins;
-////
-////    @Bean
-////    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-////        http
-////                // Ativa CORS
-////                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-////
-////                // Desativa CSRF (não usado em APIs REST)
-////                .csrf(AbstractHttpConfigurer::disable)
-////
-////                // Stateless
-////                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-////
-////                // Regras de autorização
-////                .authorizeHttpRequests(auth -> auth
-////                        // Permite todas as requisições OPTIONS (preflight)
-////                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-////
-////                        // Permite tudo temporariamente (ajuste depois)
-////                        .anyRequest().permitAll()
-////                );
-////
-////        return http.build();
-////    }
-////
-////    @Bean
-////    public CorsConfigurationSource corsConfigurationSource() {
-////        CorsConfiguration config = new CorsConfiguration();
-////
-////        // Converte a variável de ambiente em lista
-////        List<String> origins = Arrays.asList(allowedOrigins.split(","));
-////        config.setAllowedOrigins(origins);
-////
-////        // Métodos permitidos
-////        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-////
-////        // Headers permitidos (necessário Authorization, Content-Type, etc.)
-////        config.setAllowedHeaders(Arrays.asList(
-////                "Authorization",
-////                "Content-Type",
-////                "X-Requested-With",
-////                "Accept",
-////                "Origin"
-////        ));
-////
-////        // Permite enviar cookies ou headers de autenticação
-////        config.setAllowCredentials(true);
-////
-////        // Aplica configuração a todas as rotas
-////        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-////        source.registerCorsConfiguration("/**", config);
-////        return source;
-////    }
-////
-////    @Bean
-////    public PasswordEncoder passwordEncoder() {
-////        return new BCryptPasswordEncoder();
-////    }
-////
-////    @Bean
-////    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-////        return config.getAuthenticationManager();
-////    }
-////}
-//
-//
-//
-//
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//
-//
 //package br.com.fecaf.config;
 //
-//import br.com.fecaf.config.JwtAuthenticationFilter;
+//import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;
 //import org.springframework.http.HttpMethod;
@@ -111,41 +12,39 @@
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 //import org.springframework.security.web.SecurityFilterChain;
-//import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 //import org.springframework.web.cors.CorsConfiguration;
 //import org.springframework.web.cors.CorsConfigurationSource;
 //import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 //
 //import java.util.Arrays;
+//import java.util.List;
 //
 //@Configuration
 //public class SecurityConfig {
 //
-//    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-//
-//    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-//        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-//    }
+//    @Value("${app.cors.allowed-origins}")
+//    private String allowedOrigins;
 //
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 //        http
+//                 Ativa CORS
 //                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 //
+//                 Desativa CSRF (não usado em APIs REST)
 //                .csrf(AbstractHttpConfigurer::disable)
 //
+//                 Stateless
 //                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 //
+//                 Regras de autorização
 //                .authorizeHttpRequests(auth -> auth
+//                         Permite todas as requisições OPTIONS (preflight)
 //                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-//                        .requestMatchers("/api/login", "/api/users/cadastrarUser").permitAll()
 //
-//                        // 4.3) TODO o resto TAMBÉM exige token
-//                        .anyRequest().authenticated()
-//                )
-//
-//                // 5) Por fim, adiciona seu filtro de JWT ANTES do filtro de usuário e senha
-//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+//                         Permite tudo temporariamente (ajuste depois)
+//                        .anyRequest().permitAll()
+//                );
 //
 //        return http.build();
 //    }
@@ -153,15 +52,27 @@
 //    @Bean
 //    public CorsConfigurationSource corsConfigurationSource() {
 //        CorsConfiguration config = new CorsConfiguration();
-//        config.setAllowedOrigins(Arrays.asList(
-//                "https://fila-free.vercel.app"
+//
+//         Converte a variável de ambiente em lista
+//        List<String> origins = Arrays.asList(allowedOrigins.split(","));
+//        config.setAllowedOrigins(origins);
+//
+//         Métodos permitidos
+//        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//
+//         Headers permitidos (necessário Authorization, Content-Type, etc.)
+//        config.setAllowedHeaders(Arrays.asList(
+//                "Authorization",
+//                "Content-Type",
+//                "X-Requested-With",
+//                "Accept",
+//                "Origin"
 //        ));
-//        config.setAllowedMethods(Arrays.asList(
-//                "GET","POST","PUT","DELETE","OPTIONS"
-//        ));
-//        config.setAllowedHeaders(Arrays.asList("*"));
+//
+//         Permite enviar cookies ou headers de autenticação
 //        config.setAllowCredentials(true);
 //
+//         Aplica configuração a todas as rotas
 //        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 //        source.registerCorsConfiguration("/**", config);
 //        return source;
@@ -173,10 +84,99 @@
 //    }
 //
 //    @Bean
-//    public AuthenticationManager authenticationManager(
-//            AuthenticationConfiguration config
-//    ) throws Exception {
+//    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 //        return config.getAuthenticationManager();
 //    }
 //}
-//
+
+
+
+
+
+
+
+
+
+package br.com.fecaf.config;
+
+import br.com.fecaf.config.JwtAuthenticationFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+
+@Configuration
+public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                .csrf(AbstractHttpConfigurer::disable)
+
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/login", "/api/users/cadastrarUser").permitAll()
+
+//                         4.3) TODO o resto TAMBÉM exige token
+//                        .anyRequest().authenticated()
+                );
+
+//                 5) Por fim, adiciona seu filtro de JWT ANTES do filtro de usuário e senha
+//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList(
+                "https:fila-free.vercel.app"
+        ));
+        config.setAllowedMethods(Arrays.asList(
+                "GET","POST","PUT","DELETE","OPTIONS"
+        ));
+        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config
+    ) throws Exception {
+        return config.getAuthenticationManager();
+    }
+}
+
