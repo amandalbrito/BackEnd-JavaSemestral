@@ -1,11 +1,14 @@
-CREATE DATABASE IF NOT EXISTS seu_banco_de_dados;
+CREATE DATABASE db_mercado;
 
-USE seu_banco_de_dados;
+USE db_mercado;
 
-CREATE TABLE IF NOT EXISTS usuarios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS tbl_users (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
-    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    cpf VARCHAR(255) NOT NULL UNIQUE,
+    password_reset_code VARCHAR(255),
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
