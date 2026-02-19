@@ -1,4 +1,4 @@
-CREATE DATABASE db_mercado;
-
-USE db_mercado;
-
+--CREATE DATABASE db_mercado;
+--
+--USE db_mercado;
+--
