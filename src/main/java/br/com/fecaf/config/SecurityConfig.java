@@ -1,6 +1,5 @@
 package br.com.fecaf.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,11 +19,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 public class SecurityConfig {
 
+    private static final List<String> HOSTED_ALLOWED_ORIGINS = List.of(
+            "https://fila-free.vercel.app",
+            "https://amandalbrito.github.io"
+    );
     @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
 
@@ -54,6 +56,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
+        config.setAllowedOrigins(HOSTED_ALLOWED_ORIGINS);
         List<String> origins = Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
