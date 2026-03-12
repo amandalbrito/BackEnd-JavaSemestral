@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Configuration
 public class SecurityConfig {
 
-    @Value("${app.cors.allowed-origins:http://localhost:3000}")
+    @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -61,8 +61,8 @@ public class SecurityConfig {
                 .distinct()
                 .collect(Collectors.toList());
 
-        config.setAllowedOriginPatterns(origins);
-        config.setAllowedMethods(List.of("*"));
+        config.setAllowedOrigins(origins);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
@@ -76,7 +76,6 @@ public class SecurityConfig {
     private String normalizeOrigin(String origin) {
         try {
             URI uri = URI.create(origin);
-
             if (uri.getScheme() == null || uri.getHost() == null) {
                 return origin;
             }
@@ -86,7 +85,6 @@ public class SecurityConfig {
             if (port != -1) {
                 normalized += ":" + port;
             }
-
             return normalized;
         } catch (IllegalArgumentException ex) {
             return origin;
