@@ -20,4 +20,3 @@ Backend da aplicação **Fila Free**, responsável pela lógica de negócio do s
 # Configurar banco de dados
 # Executar aplicação Java
 ```
-<img width="1362" height="680" alt="FilaFree-BackEnd" src="https://github.com/user-attachments/assets/05bbcaef-ce6b-4da9-b4e7-507a43919c7c" />
