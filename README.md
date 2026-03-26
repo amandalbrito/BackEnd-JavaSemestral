@@ -1,22 +1,23 @@
 # 🛒 Fila Free - Backend
 
 ## 📌 Sobre
-Backend da aplicação **Fila Free**, responsável pelas regras de negócio e gerenciamento das filas de atendimento.
+Backend da aplicação **Fila Free**, responsável pela lógica de negócio do sistema de compras, incluindo gerenciamento de produtos, carrinho e processamento de pedidos.
 
 ## 🚀 Tecnologias
 - Java  
 - SQL  
+- (Integração em andamento: Stripe API)
 
 ## 🎯 Funcionalidades
-- Gerenciamento de filas  
-- Controle de atendimentos  
-- Integração com banco de dados  
-- Processamento das regras de negócio  
+- Cadastro e consulta de produtos  
+- Adição de itens ao carrinho  
+- Processamento de pedidos  
+- Estrutura para integração com pagamento online  
+- Suporte ao envio de confirmação por e-mail (em desenvolvimento)  
 
 ## ▶️ Como executar
 ```bash
-# Configurar o banco de dados
-# Executar a aplicação Java
+# Configurar banco de dados
+# Executar aplicação Java
 ```
-
 <img width="1362" height="680" alt="FilaFree-BackEnd" src="https://github.com/user-attachments/assets/05bbcaef-ce6b-4da9-b4e7-507a43919c7c" />
